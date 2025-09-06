@@ -1,0 +1,161 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4 text-center">E-Commerce Product Catalog</h1>
+
+      <!-- Animated Toast (Step 3) -->
+      <div *ngIf="showToast"
+           [@slideInOut]
+           class="toast-container position-fixed top-0 end-0 p-3"
+           style="z-index: 1050;">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <i class="fas fa-circle-check text-success me-2"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" (click)="showToast = false" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            {{ toastMessage }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-danger" role="alert">
+        {{ error }}
+        <button class="btn btn-sm btn-outline-danger ms-2" (click)="syncProducts()">
+          Try Sync Products
+        </button>
+      </div>
+
+      <!-- Controls -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <label class="form-label">Search Products</label>
+          <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   [(ngModel)]="searchQuery"
+                   (keyup.enter)="onSearch()
+"
+                   placeholder="Search by name...">
+            <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+              Search
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Category</label>
+          <select class="form-control"
+                  [(ngModel)]="selectedCategory"
+                  (change)="onCategoryChange()">
+            <option value="all">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Sort By</label>
+          <select class="form-control"
+                  [(ngModel)]="sortBy"
+                  (change)="onSortChange()">
+            <option value="createdAt">Latest</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Order</label>
+          <select class="form-control"
+                  [(ngModel)]="sortOrder"
+                  (change)="onSortChange()">
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading-spinner text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="row" *ngIf="!loading && !error">
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4" *ngFor="let product of products">
+          <div class="card product-card h-100 shadow-sm">
+            <img [src]="product.imageUrl"
+                 [alt]="product.name"
+                 class="card-img-top"
+                 style="height: 250px; object-fit: cover;"
+                 (error)="onImgError($event)">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text text-muted small flex-grow-1">
+                {{ product.description.length > 100 ? (product.description | slice:0:100) + '...' : product.description }}
+              </p>
+              <div class="mt-auto">
+                <p class="price mb-2">${{ product.price | number:'1.2-2' }}</p>
+                <p class="text-muted small mb-1">
+                  <strong>Category:</strong> {{ product.category }}
+                </p>
+                <p class="text-success small mb-2">
+                  <strong>Stock:</strong> {{ product.stock }} units
+                </p>
+
+                <!-- Animated Add to Cart button (Step 3) -->
+                <button class="btn btn-primary btn-sm w-100"
+                        [@buttonClick]="getButtonState(product.id)"
+                        (click)="addToCart(product)">
+                  <i class="fas fa-cart-plus me-1"></i>
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="!loading && !error && products.length === 0" class="text-center py-5">
+        <h4>No products found</h4>
+        <p class="text-muted">Try adjusting your search criteria or sync products from external API</p>
+        <button class="btn btn-primary" (click)="syncProducts()">
+          Sync Products from API
+        </button>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="totalPages > 1" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <a class="page-link" (click)="prevPage()" style="cursor: pointer">Previous</a>
+          </li>
+          <li class="page-item"
+              *ngFor="let page of getPages(); let i = index"
+              [class.active]="page === currentPage"
+              [class.d-none]="totalPages > 10 && (i < currentPage - 2 || i > currentPage + 2) && i !== 0 && i !== totalPages - 1">
+            <a class="page-link" (click)="goToPage(page)" style="cursor: pointer">{{ page + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+            <a class="page-link" (click)="nextPage()" style="cursor: pointer">Next</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Results Info -->
+      <div class="text-center mt-3">
+        <small class="text-muted">
+          Showing {{ products.length }} of {{ totalElements }} products
+          <span *ngIf="totalPages > 0">(Page {{ currentPage + 1 }} of {{ totalPages }})</span>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>

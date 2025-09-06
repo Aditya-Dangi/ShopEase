@@ -1,0 +1,102 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-primary bg-gradient">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
+              <h2 class="fw-bold">Welcome Back</h2>
+              <p class="text-muted">Sign in to your account</p>
+            </div>
+
+            <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)" novalidate>
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-control form-control-lg"
+                  placeholder="Enter your email"
+                  [(ngModel)]="credentials.email"
+                  required
+                  email
+                  #email="ngModel"
+                  [class.is-invalid]="email.invalid && email.touched">
+                <div *ngIf="email.invalid && email.touched" class="invalid-feedback">
+                  <small *ngIf="email.errors?.['required']">Email is required</small>
+                  <small *ngIf="email.errors?.['email']">Please enter a valid email</small>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password"
+                    name="password"
+                    class="form-control form-control-lg"
+                    placeholder="Enter your password"
+                    [(ngModel)]="credentials.password"
+                    required
+                    minlength="6"
+                    #password="ngModel"
+                    [class.is-invalid]="password.invalid && password.touched">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="togglePassword()">
+                    <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div *ngIf="password.invalid && password.touched" class="text-danger">
+                  <small *ngIf="password.errors?.['required']">Password is required</small>
+                  <small *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</small>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  [disabled]="!loginForm.valid || loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!loading" class="fas fa-sign-in-alt me-2"></i>
+                  {{ loading ? 'Signing In...' : 'Sign In' }}
+                </button>
+              </div>
+
+              <div *ngIf="errorMessage" class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+              </div>
+
+              <div *ngIf="successMessage" class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+              </div>
+            </form>
+
+            <hr class="my-4">
+
+            <div class="text-center">
+              <p class="mb-0">
+                Don't have an account?
+                <a routerLink="/register" class="text-decoration-none fw-bold">
+                  Create Account
+                </a>
+              </p>
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded-3">
+              <small class="text-muted d-block text-center">
+                <i class="fab fa-google me-1"></i>
+                <strong>Powered by Firebase</strong>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

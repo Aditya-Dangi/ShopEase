@@ -1,0 +1,87 @@
+<!-- Toast Notification -->
+<div *ngIf="showToast"
+     [@slideInOut]
+     class="toast-container position-fixed top-0 end-0 p-3"
+     style="z-index: 1050;"
+     aria-live="polite" aria-atomic="true" role="status">
+  <div class="toast show">
+    <div class="toast-header">
+      <i class="fas fa-check-circle text-success me-2" aria-hidden="true"></i>
+      <strong class="me-auto">Cart Update</strong>
+      <button type="button" class="btn-close" (click)="showToast = false" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      {{ toastMessage }}
+    </div>
+  </div>
+</div>
+
+<div class="container py-4" *ngIf="cart">
+  <h3>Shopping Cart</h3>
+
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let it of cart.items">
+          <td>
+            <div class="d-flex align-items-center">
+              <img [src]="it.imageUrl"
+                   [alt]="it.name"
+                   class="rounded me-3"
+                   style="width: 60px; height: 60px; object-fit: cover;"
+                   (error)="onImgError($event)">
+              <span>{{ it.name }}</span>
+            </div>
+          </td>
+
+          <td>${{ it.price | number:'1.2-2' }}</td>
+
+          <td>
+            <button [@buttonClick]="getButtonState('dec-' + it.productId)"
+                    class="btn btn-sm btn-outline-secondary"
+                    (click)="dec(it)">-</button>
+
+            <span class="mx-2">{{ it.quantity }}</span>
+
+            <button [@buttonClick]="getButtonState('inc-' + it.productId)"
+                    class="btn btn-sm btn-outline-secondary"
+                    (click)="inc(it)">+</button>
+          </td>
+
+          <td>${{ (it.price * it.quantity) | number:'1.2-2' }}</td>
+
+          <td>
+            <button [@buttonClick]="getButtonState('remove-' + it.productId)"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="remove(it)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <th colspan="3" class="text-end">Total</th>
+          <th>${{ cart.total | number:'1.2-2' }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary" (click)="refresh()">Refresh</button>
+    <button [@buttonClick]="getButtonState('clear')"
+            class="btn btn-outline-danger"
+            (click)="clear()">Clear Cart</button>
+  </div>
+</div>
